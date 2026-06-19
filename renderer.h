@@ -38,7 +38,7 @@ typedef struct {
     u16 width;  // 2 bytes
     u16 height; // 2 bytes
 
-    u8 padding[4]; // 4 bytes padding, explicit
+    // u8 padding[4]; // 4 bytes padding, explicit
 } Buffer;
 
 // sanity check
@@ -47,14 +47,16 @@ static_assert(sizeof(Buffer) == 16, "buffer size doesn't match the expected layo
 // renderer struct
 typedef struct {
     // these two will be flipped and the one referenced to front will be displayed to the user
-    Buffer* front;
-    Buffer* back;
+    Buffer* front; // 8 bytes
+    Buffer* back;  // 8 bytes
 
-    u16 width;
-    u16 height;
+    u16 width;     // 2 bytes
+    u16 height;    // 2 bytes
 
     // potentially add an optional fps cap:
-    // u16 fps;
+    // u16 fps; // 2 bytes
+
+    // u8 padding[4]; // 4 bytes padding, explicit
 } Renderer;
 
 // another sanity check

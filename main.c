@@ -1,7 +1,41 @@
+#include <stdio.h>
+#include <assert.h>
 #include <SDL2/SDL.h>
+#include "renderer.h"
 
-// simple test to make sure im not losing it over vcpkg
+// simple check to make sure buffers work fine
+void sanity_check(void) {
+    Renderer* r = make_renderer(800, 600);
+
+    // ensure allocation succeeded
+    assert(r != NULL);
+    assert(r->back  != NULL && r->back->data  != NULL);
+    assert(r->front != NULL && r->front->data != NULL);
+
+    // check dimensions match what was requested
+    assert(r->width  == 800);
+    assert(r->height == 600);
+    assert(r->back->width   == 800 && r->back->height  == 600);
+    assert(r->front->width  == 800 && r->front->height == 600);
+
+    // check that front and back are separate allocations
+    assert(r->back != r->front);
+    assert(r->back->data != r->front->data);
+
+    // check writing to back doesn't affect front
+    r->back->data[0] = 0xDEADBEEF;
+    assert(r->front->data[0] != 0xDEADBEEF);
+    printf("sanity check passed\n");
+
+    destroy_renderer(r);
+}
+
+// another simple test to make sure im not losing it over vcpkg
 int main(int argc, char* argv[]) {
+    // call the quick sanity check
+    sanity_check();
+
+    // now the sdl test
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window* window = SDL_CreateWindow(
