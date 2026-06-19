@@ -12,21 +12,21 @@ typedef uint16_t u16;
 typedef uint32_t u32;
 
 // color helper (packing 4 u8s into u32 RRGGBBAA)
-static inline u32 color(u8 r, u8 g, u8 b, u8 a) {
+static inline u32 pack_color(u8 r, u8 g, u8 b, u8 a) {
     return (r << 24 | g << 16 | b << 8 | a);
 }
 
 // color helpers
-#define COLOR_BLACK color(0,   0,   0,   255)
-#define COLOR_WHITE color(255, 255, 255, 255)
-#define COLOR_RED   color(255, 0,   0,   255)
-#define COLOR_GREEN color(0,   255, 0,   255)
-#define COLOR_BLUE  color(0,   0,   255, 255)
+#define COLOR_BLACK pack_color(0,   0,   0,   255)
+#define COLOR_WHITE pack_color(255, 255, 255, 255)
+#define COLOR_RED   pack_color(255, 0,   0,   255)
+#define COLOR_GREEN pack_color(0,   255, 0,   255)
+#define COLOR_BLUE  pack_color(0,   0,   255, 255)
 
 // vector types
 typedef struct {
     u16 x, y;
-} Vec2;
+} Vec2; // unused for rn (might add this where an x and y are provided)
 
 typedef struct {
     u16 x, y, z;

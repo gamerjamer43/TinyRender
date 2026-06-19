@@ -70,3 +70,25 @@ void destroy_renderer(Renderer* r) {
 void clear_renderer(Renderer* r, u32 color) {
     clear_buffer(r->back, color);
 }
+
+// draw api (public)
+/**
+ * draw a single pixel to the screen
+ */
+void draw_pixel(Renderer* r, u16 x, u16 y, u32 color) {
+    if (x >= r->width || y >= r->height) return;
+
+    // y * width + x gets us the proper pixel index from a Vec2
+    r->back->data[(u32)y * r->width + x] = color;
+}
+
+/**
+ * draw a rectangle to the screen
+ */
+void draw_rectangle(Renderer* r, u16 x, u16 y, u16 width, u16 height, u32 color) {
+    for (u16 row = y; row < y + height; row++) {
+        for (u16 col = x; col < x + width; col++) {
+            draw_pixel(r, col, row, color);
+        }
+    }
+}
