@@ -4,6 +4,7 @@
 #include "renderer.h"
 
 // simple check to make sure buffers work fine
+// simple check to make sure buffers work fine
 void sanity_check(void) {
     Renderer* r = make_renderer(800, 600);
 
@@ -25,8 +26,24 @@ void sanity_check(void) {
     // check writing to back doesn't affect front
     r->back->data[0] = 0xDEADBEEF;
     assert(r->front->data[0] != 0xDEADBEEF);
-    printf("sanity check passed\n");
 
+    // check renderer_clear actually fills the back buffer
+    u32 n = (u32)r->back->width * (u32)r->back->height;
+
+    // poison back buffer (to check that clear actually wrote over it)
+    for (u32 i = 0; i < n; i++) r->back->data[i] = 0xDEADBEEF;
+    clear_renderer(r, COLOR_RED);
+
+    // check that it was overwritten
+    for (u32 i = 0; i < n; i++) {
+        assert(r->back->data[i] == COLOR_RED);
+    }
+
+    // check front buffer is untouched (clear should only target the back buffer)
+    assert(r->front->data[0] != COLOR_RED);
+
+    // all good!
+    printf("sanity check passed\n");
     destroy_renderer(r);
 }
 
