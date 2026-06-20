@@ -103,27 +103,8 @@ void draw_rectangle(Renderer* r, u16 x, u16 y, u16 width, u16 height, u32 color)
     }
 }
 
-/**
- * dumps a portable pixelmap containing the front buffer (RRGGBB, alpha is ignored)
- * useful for debugging (maybe. idk)
- */
-void renderer_write_ppm(Renderer* r) {
-    printf("P6\n%d %d\n255\n", r->width, r->height);
-
-    Buffer* buf = r->front;
-    u32 n_pixels = (u32)buf->width * (u32)buf->height;
-
-    for (u32 i = 0; i < n_pixels; i++) {
-        u32 px = buf->data[i];
-        putchar((px >> 24) & 0xFF); // red
-        putchar((px >> 16) & 0xFF); // green
-        putchar((px >> 8)  & 0xFF); // blu
-    }
-}
-
 // all of this is for drawing triangles.
 // i dont even know
-
 /**
  * return the minimum of three numbers
  */
@@ -162,3 +143,21 @@ void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, u32 col) {
         }
     }
 }
+
+/**
+ * dumps a portable pixelmap containing the front buffer (RRGGBB, alpha is ignored)
+ * useful for debugging (maybe. idk)
+ */
+// void renderer_write_ppm(Renderer* r) {
+//     printf("P6\n%d %d\n255\n", r->width, r->height);
+
+//     Buffer* buf = r->front;
+//     u32 n_pixels = (u32)buf->width * (u32)buf->height;
+
+//     for (u32 i = 0; i < n_pixels; i++) {
+//         u32 px = buf->data[i];
+//         putchar((px >> 24) & 0xFF); // red
+//         putchar((px >> 16) & 0xFF); // green
+//         putchar((px >> 8)  & 0xFF); // blu
+//     }
+// }

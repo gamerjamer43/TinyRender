@@ -15,6 +15,7 @@ Display display_create(Renderer* r, const char* title) {
     d.sdl_renderer = SDL_CreateRenderer(d.window, -1,
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
+    // texture defaults to RGBA8888 with a stream based access
     d.texture = SDL_CreateTexture(d.sdl_renderer,
         SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING,
         r->width, r->height);

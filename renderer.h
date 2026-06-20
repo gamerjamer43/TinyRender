@@ -32,11 +32,12 @@ static inline u32 pack_color(u8 r, u8 g, u8 b, u8 a) {
 // vector types
 typedef struct {
     u16 x, y;
-} Vec2; // unused for rn (might add this where an x and y are provided)
+} Vec2;
 
 typedef struct {
     u16 x, y, z;
 } Vec3; // unused for rn (will when z buffering comes in)
+
 
 // buffer itself
 typedef struct {

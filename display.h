@@ -5,8 +5,7 @@
 #include "renderer.h"
 
 /**
- * sdl display output, containing refs to window, an sdl renderer (ig it makes no sense to write my own on top of this)
- * and a texture. texture defaults to RGBA8888 with a stream based access
+ * sdl display output, containing refs to window, an sdl renderer, and a texture
  */
 typedef struct {
     SDL_Window*   window;
