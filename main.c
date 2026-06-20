@@ -80,6 +80,40 @@ static void draw_triangle_frame(TestContext* ctx) {
 }
 
 /**
+ * helper for the rainbow traingle test
+ */
+static u32 rainbow_color(float hue) {
+    float phase = hue * 2.0f * (float)M_PI;
+    return pack_color(
+        (u8)((sinf(phase) + 1.0f) * 127.5f),
+        (u8)((sinf(phase + 2.0f * (float)M_PI / 3.0f) + 1.0f) * 127.5f),
+        (u8)((sinf(phase + 4.0f * (float)M_PI / 3.0f) + 1.0f) * 127.5f),
+        255
+    );
+}
+
+/**
+ * draws a fixed triangle with a slowly phasing rainbow gradient
+ */
+static void draw_rainbow_triangle_frame(TestContext* ctx) {
+    u16 top = (u16)(ctx->center.y - 170);
+    u16 bottom = (u16)(ctx->center.y + 140);
+    float half_width = 180.0f;
+    float phase = ctx->time * 0.04f;
+
+    for (u16 y = top; y <= bottom; y++) {
+        float t = (float)(y - top) / (float)(bottom - top);
+        u16 left = (u16)(ctx->center.x - half_width * t);
+        u16 right = (u16)(ctx->center.x + half_width * t);
+
+        for (u16 x = left; x <= right; x++) {
+            float hue = ((float)(x - left) / (float)(right - left)) + phase;
+            draw_pixel(ctx->r, x, y, rainbow_color(hue));
+        }
+    }
+}
+
+/**
  * draws a circle at the center that pulsates in radius over time
  */
 static void draw_circle_frame(TestContext* ctx) {
@@ -105,11 +139,13 @@ void circle_test(void) {
     run_test("simple software renderer", draw_circle_frame);
 }
 
-int main(int argc, char** argv) {
-    (void)argc;
-    (void)argv;
+void rainbow_triangle_test(void) {
+    run_test("simple software renderer", draw_rainbow_triangle_frame);
+}
 
-    triangle_test();
-    circle_test();
+int main(void) {
+    // triangle_test();
+    // circle_test();
+    rainbow_triangle_test();
     return 1;
 }

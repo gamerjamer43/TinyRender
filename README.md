@@ -8,12 +8,12 @@ Another dumb little project I made which may get mildly expanded on, but mostly 
 - [x] Buffers of adjustible size, and the Renderer struct
 - [x] Safe API for creation and destruction of the renderer and buffers
 - [x] Drawing of rectangles, triangles, circles, and single pixels.
+- [x] Solid and gradient textures
 - [x] Double buffering (drawing to the back, and flipping)
 - [x] Simple display using SDL2
 
 ## What I Can Think of Adding:
 
-- Gradient textures
 - Z-buffering
 - PNG based sprite loading
 - Interactive elements (maybe, click based or keybind based events)
