@@ -75,7 +75,7 @@ static void draw_triangle_frame(TestContext* ctx) {
         p[i].y = (u16)(ctx->center.y + sinf(a) * radius);
     }
 
-    Fill fill = fill_linear(p[0], p[1], COLOR_RED, COLOR_BLUE);
+    Fill fill = fill_linear(p[0], p[1], COLOR_RED, pack_color(150, 20, 20, 255));
     draw_tri(ctx->r, p[0], p[1], p[2], fill);
 }
 
@@ -144,8 +144,8 @@ void rainbow_triangle_test(void) {
 }
 
 int main(void) {
-    // triangle_test();
+    triangle_test();
     // circle_test();
-    rainbow_triangle_test();
+    // rainbow_triangle_test();
     return 1;
 }

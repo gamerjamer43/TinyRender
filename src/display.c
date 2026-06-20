@@ -44,22 +44,23 @@ Display display_create(Renderer* r, const char* title) {
 
 // draw an fps counter on the screen
 SDL_Color white = {255, 255, 255, 255};
+static int last_fps = -1;
+static SDL_Texture* fps_tex = NULL;
+static int fps_w, fps_h;
+
 static void display_draw_fps(Display* d, Renderer* r, int fps) {
-    // convert int to string
-    char buf[16];
-    snprintf(buf, sizeof(buf), "%d fps", fps);
-
-    // create a white text texture
-    SDL_Surface* surf = TTF_RenderText_Blended(d->font, buf, white);
-    SDL_Texture* text_tex = SDL_CreateTextureFromSurface(d->sdl_renderer, surf);
-
-    // copy texture to renderer (size up text 2x)
-    SDL_Rect dst = { r->width - surf->w - 30, 10, surf->w * 2, surf->h * 2};
-    SDL_RenderCopy(d->sdl_renderer, text_tex, NULL, &dst);
-
-    // destroy when done
-    SDL_FreeSurface(surf);
-    SDL_DestroyTexture(text_tex);
+    if (fps != last_fps) {
+        if (fps_tex) SDL_DestroyTexture(fps_tex);
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%d fps", fps);
+        SDL_Surface* surf = TTF_RenderText_Blended(d->font, buf, white);
+        fps_tex = SDL_CreateTextureFromSurface(d->sdl_renderer, surf);
+        fps_w = surf->w; fps_h = surf->h;
+        SDL_FreeSurface(surf);
+        last_fps = fps;
+    }
+    SDL_Rect dst = { r->width - fps_w - 30, 10, fps_w * 2, fps_h * 2 };
+    SDL_RenderCopy(d->sdl_renderer, fps_tex, NULL, &dst);
 }
 
 // copy data from renderer to sdl
