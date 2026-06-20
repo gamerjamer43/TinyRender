@@ -81,7 +81,7 @@ void flip_renderer(Renderer* r) {
 }
 
 // fill api (private)
-static inline Fill fill_solid(u32 color) {
+Fill fill_solid(u32 color) {
     return (Fill){
         .type = FILL_SOLID,
         .color_a = color,
@@ -89,7 +89,7 @@ static inline Fill fill_solid(u32 color) {
     };
 }
 
-static inline Fill fill_linear(Vec2 start, Vec2 end, u32 a, u32 b) {
+Fill fill_linear(Vec2 start, Vec2 end, u32 a, u32 b) {
     return (Fill){
         .type = FILL_GRADIENT,
         .color_a = a,
@@ -144,10 +144,10 @@ void draw_pixel(Renderer* r, u16 x, u16 y, u32 color) {
  * draw a rectangle to the screen
  * clean the params up because what the fuckkk
  */
-void draw_rectangle(Renderer* r, u16 x, u16 y, u16 width, u16 height, u32 color) {
+void draw_rectangle(Renderer* r, u16 x, u16 y, u16 width, u16 height, Fill fill) {
     for (u16 row = y; row < y + height; row++) {
         for (u16 col = x; col < x + width; col++) {
-            draw_pixel(r, col, row, color);
+            draw_pixel(r, col, row, sample_fill(fill, col, row));
         }
     }
 }
@@ -173,9 +173,9 @@ static int edge(Vec2 a, Vec2 b, u16 px, u16 py) {
 }
 
 /**
- * draw a triangle given three (x, y) points and a color.
+ * draw a triangle given three (x, y) points and a fill.
  */
-void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, u32 col) {
+void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, Fill fill) {
     u16 minx = min3(a.x, b.x, c.x), maxx = max3(a.x, b.x, c.x);
     u16 miny = min3(a.y, b.y, c.y), maxy = max3(a.y, b.y, c.y);
 
@@ -187,16 +187,16 @@ void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, u32 col) {
 
             if ((w0 >= 0 && w1 >= 0 && w2 >= 0) ||
                 (w0 <= 0 && w1 <= 0 && w2 <= 0)) {
-                draw_pixel(r, px, py, col);
+                draw_pixel(r, px, py, sample_fill(fill, px, py));
             }
         }
     }
 }
 
 /**
- * draw a filled circle given a center, radius, and color
+ * draw a filled circle given a center, radius, and fill
  */
-void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, u32 color) {
+void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, Fill fill) {
     int r2 = (int)radius * (int)radius;
 
     for (int py = cy - radius; py <= cy + radius; py++) {
@@ -208,7 +208,7 @@ void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, u32 color) {
             int dy = py - cy;
 
             if (dx * dx + dy * dy <= r2) {
-                draw_pixel(r, (u16)px, (u16)py, color);
+                draw_pixel(r, (u16)px, (u16)py, sample_fill(fill, (u16)px, (u16)py));
             }
         }
     }

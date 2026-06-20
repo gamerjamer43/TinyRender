@@ -66,7 +66,7 @@ typedef struct {
 // fills (can either be solid color or gradient, other textures coming later)
 typedef enum {
     FILL_SOLID,
-    FILL_GRADIENT
+    FILL_GRADIENT,
 } FillType;
 
 typedef struct {
@@ -120,17 +120,22 @@ void      destroy_renderer(Renderer* r);          // free
 void      clear_renderer(Renderer* r, u32 color); // fills the back buffer with a certain color
 void      flip_renderer(Renderer* r);             // swaps back and front
 
+// fill helpers
+Fill fill_solid(u32 color);
+Fill fill_linear(Vec2 start, Vec2 end, u32 a, u32 b);
+
 // drawing helpers
 void draw_pixel(Renderer* r, u16 x, u16 y, u32 col);
-void draw_rectangle(Renderer* r, u16 x, u16 y, u16 w, u16 h, u32 col);
-void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, u32 col);
+void draw_rectangle(Renderer* r, u16 x, u16 y, u16 w, u16 h, Fill fill);
+void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, Fill fill);
+void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, Fill fill);
 
 // helpers we might need
 void renderer_write_ppm(Renderer* r);  // dump renderer content to stdout using a portable pixelmap
 
 
 // simple check to make sure buffers work fine
-static inline int test_renderer() {
+static inline int test_renderer(void) {
     Renderer* r = make_renderer(800, 600);
 
     // ensure allocation succeeded

@@ -45,7 +45,6 @@ static void run_test(const char* title, DrawFn draw_fn) {
             char title_buf[16];
             fps = frame_count;
             snprintf(title_buf, sizeof(title_buf), "%d fps", fps);
-            SDL_SetWindowTitle(d.window, title_buf);
             frame_count = 0;
             fps_timer = now;
         }
@@ -76,7 +75,8 @@ static void draw_triangle_frame(TestContext* ctx) {
         p[i].y = (u16)(ctx->center.y + sinf(a) * radius);
     }
 
-    draw_tri(ctx->r, p[0], p[1], p[2], COLOR_RED);
+    Fill fill = fill_linear(p[0], p[1], COLOR_RED, COLOR_BLUE);
+    draw_tri(ctx->r, p[0], p[1], p[2], fill);
 }
 
 /**
@@ -88,18 +88,27 @@ static void draw_circle_frame(TestContext* ctx) {
 
     // radius + sin(dt) * pulse gives a nice infinite grow/shrink
     u16 radius = (u16)(base_radius + sinf(ctx->time) * pulse_amount);
-    draw_circle(ctx->r, (u16)ctx->center.x, (u16)ctx->center.y, radius, COLOR_RED);
+    Fill fill = fill_linear(
+        (Vec2){ ctx->center.x, (u16)(ctx->center.y - radius) },
+        (Vec2){ ctx->center.x, (u16)(ctx->center.y + radius) },
+        COLOR_RED,
+        COLOR_BLUE
+    );
+    draw_circle(ctx->r, (u16)ctx->center.x, (u16)ctx->center.y, radius, fill);
 }
 
-void triangle_test() {
+void triangle_test(void) {
     run_test("simple software renderer", draw_triangle_frame);
 }
 
-void circle_test() {
+void circle_test(void) {
     run_test("simple software renderer", draw_circle_frame);
 }
 
-int main(void) {
+int main(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
+
     triangle_test();
     circle_test();
     return 1;
