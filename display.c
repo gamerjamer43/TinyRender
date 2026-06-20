@@ -1,7 +1,7 @@
 #include "display.h"
 #include "renderer.h"
 
-static Display display_create(Renderer* r, const char* title) {
+Display display_create(Renderer* r, const char* title) {
     SDL_Init(SDL_INIT_VIDEO);
     Display d;
 
@@ -23,14 +23,14 @@ static Display display_create(Renderer* r, const char* title) {
 }
 
 // copy data from renderer to sdl
-static void display_present(Display* d, Renderer* r) {
+void display_present(Display* d, Renderer* r) {
     SDL_UpdateTexture(d->texture, NULL, r->front->data, r->width * sizeof(u32));
     SDL_RenderCopy(d->sdl_renderer, d->texture, NULL, NULL);
     SDL_RenderPresent(d->sdl_renderer);
 }
 
 // free helper for display
-static void display_destroy(Display* d) {
+void display_destroy(Display* d) {
     SDL_DestroyTexture(d->texture);
     SDL_DestroyRenderer(d->sdl_renderer);
     SDL_DestroyWindow(d->window);
@@ -38,7 +38,7 @@ static void display_destroy(Display* d) {
 }
 
 // sdl helper for quit polling
-static int poll_should_quit() {
+int poll_should_quit() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) return 1;

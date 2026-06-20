@@ -2,6 +2,7 @@
 #define DISPLAY_H
 
 #include <SDL2/SDL.h>
+#include "renderer.h"
 
 /**
  * sdl display output, containing refs to window, an sdl renderer (ig it makes no sense to write my own on top of this)
@@ -14,11 +15,11 @@ typedef struct {
 } Display;
 
 // display api
-static Display display_create(Renderer* r, const char* title);
-static void display_present(Display* d, Renderer* r);
-static void display_destroy(Display* d);
+Display display_create(Renderer* r, const char* title);
+void display_present(Display* d, Renderer* r);
+void display_destroy(Display* d);
 
 // sdl helper
-static int poll_should_quit();
+int poll_should_quit();
 
 #endif
