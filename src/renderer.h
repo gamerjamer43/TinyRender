@@ -29,6 +29,31 @@ static inline u32 pack_color(u8 r, u8 g, u8 b, u8 a) {
 #define COLOR_GREEN pack_color(0,   255, 0,   255)
 #define COLOR_BLUE  pack_color(0,   0,   255, 255)
 
+// color interpolation (from point a to b by a factor of t)
+static u8 lerp_u8(u8 a, u8 b, float t) {
+    return (u8)(a + (b - a) * t);
+}
+
+// take each channel and lerp as a u8, then repack
+static u32 lerp_color(u32 a, u32 b, float t) {
+    u8 ar = (a >> 24) & 0xFF;
+    u8 ag = (a >> 16) & 0xFF;
+    u8 ab = (a >> 8) & 0xFF;
+    u8 aa = a & 0xFF;
+
+    u8 br = (b >> 24) & 0xFF;
+    u8 bg = (b >> 16) & 0xFF;
+    u8 bb = (b >> 8) & 0xFF;
+    u8 ba = b & 0xFF;
+
+    return pack_color(
+        lerp_u8(ar, br, t),
+        lerp_u8(ag, bg, t),
+        lerp_u8(ab, bb, t),
+        lerp_u8(aa, ba, t)
+    );
+}
+
 // vector types
 typedef struct {
     u16 x, y;
