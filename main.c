@@ -1,82 +1,45 @@
-#include <stdio.h>
-#include <assert.h>
 #include <SDL2/SDL.h>
+#include "display.h"
 #include "renderer.h"
 
-// simple check to make sure buffers work fine
-// simple check to make sure buffers work fine
-void sanity_check(void) {
+int main(void) {
+    // test just to confirm
+    test_renderer();
+
     Renderer* r = make_renderer(800, 600);
+    Display d = display_create(r, "simple software renderer");
 
-    // ensure allocation succeeded
-    assert(r != NULL);
-    assert(r->back  != NULL && r->back->data  != NULL);
-    assert(r->front != NULL && r->front->data != NULL);
+    float angle = 0.0f;    // current angle
+    float radius = 150.0f; // each vertex sits 150px from the center
 
-    // check dimensions match what was requested
-    assert(r->width  == 800);
-    assert(r->height == 600);
-    assert(r->back->width   == 800 && r->back->height  == 600);
-    assert(r->front->width  == 800 && r->front->height == 600);
+    // center of the screen
+    Vec2 center = { r->width / 2, r->height / 2 };
 
-    // check that front and back are separate allocations
-    assert(r->back != r->front);
-    assert(r->back->data != r->front->data);
+    while (!poll_should_quit()) {
+        clear_renderer(r, COLOR_BLACK);
 
-    // check writing to back doesn't affect front
-    r->back->data[0] = 0xDEADBEEF;
-    assert(r->front->data[0] != 0xDEADBEEF);
+        // 3 vertices for the triangle
+        Vec2 p[3];
 
-    // check renderer_clear actually fills the back buffer
-    u32 n = (u32)r->back->width * (u32)r->back->height;
+        for (int i = 0; i < 3; i++) {
+            // full circle is 2pi radians, divided into 3 parts (rotation repeats when 1/3 of a turn is reached)
+            // all 3 vertices stay 120 degrees apart
+            float a = angle + i * (2.0f * (float)M_PI / 3.0f);
 
-    // poison back buffer (to check that clear actually wrote over it)
-    for (u32 i = 0; i < n; i++) r->back->data[i] = 0xDEADBEEF;
-    clear_renderer(r, COLOR_RED);
+            // parametric circles!!! i remembered something from calc!
+            p[i].x = (u16)(center.x + cosf(a) * radius);
+            p[i].y = (u16)(center.y + sinf(a) * radius);
+        }
 
-    // check that it was overwritten
-    for (u32 i = 0; i < n; i++) {
-        assert(r->back->data[i] == COLOR_RED);
+        draw_tri(r, p[0], p[1], p[2], COLOR_RED);
+        flip_renderer(r);
+        display_present(&d, r);
+
+        // rotate 0.02 radians per tick
+        angle += 0.02f;
     }
 
-    // check front buffer is untouched (clear should only target the back buffer)
-    assert(r->front->data[0] != COLOR_RED);
-
-    // all good!
-    printf("sanity check passed\n");
+    display_destroy(&d);
     destroy_renderer(r);
-}
-
-// another simple test to make sure im not losing it over vcpkg
-int main(int argc, char* argv[]) {
-    // call the quick sanity check
-    sanity_check();
-
-    // now the sdl test
-    SDL_Init(SDL_INIT_VIDEO);
-
-    SDL_Window* window = SDL_CreateWindow(
-        "SDL2 Test",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        800, 600,
-        0
-    );
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    int running = 1;
-    SDL_Event e;
-    while (running) {
-        while (SDL_PollEvent(&e))
-            if (e.type == SDL_QUIT) running = 0;
-
-        SDL_SetRenderDrawColor(renderer, 100, 150, 255, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
-    }
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
     return 0;
 }

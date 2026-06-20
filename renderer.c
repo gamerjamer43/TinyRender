@@ -10,10 +10,10 @@
 static Buffer* make_buffer(u16 width, u16 height) {
     Buffer* buf = malloc(sizeof(Buffer));
 
-    buf->width = width;
+    buf->width  = width;
     buf->height = height;
 
-    buf->data = malloc((u32)width * (u32)height * sizeof(u32));
+    buf->data   = malloc((u32)width * (u32)height * sizeof(u32));
 
     return buf;
 }
@@ -44,11 +44,11 @@ static void clear_buffer(Buffer* buf, u32 color) {
 Renderer* make_renderer(u16 width, u16 height) {
     Renderer* r = malloc(sizeof(Renderer));
 
-    r->width = width;
+    r->width  = width;
     r->height = height;
 
-    r->back = make_buffer(width, height);
-    r->front = make_buffer(width, height);
+    r->back   = make_buffer(width, height);
+    r->front  = make_buffer(width, height);
 
     return r;
 }
@@ -69,6 +69,15 @@ void destroy_renderer(Renderer* r) {
  */ 
 void clear_renderer(Renderer* r, u32 color) {
     clear_buffer(r->back, color);
+}
+
+/**
+ * switch the back and front buffers
+ */
+void flip_renderer(Renderer* r) {
+    Buffer* temp = r->front;
+    r->front     = r->back;
+    r->back      = temp;
 }
 
 // draw api (public)
@@ -96,6 +105,7 @@ void draw_rectangle(Renderer* r, u16 x, u16 y, u16 width, u16 height, u32 color)
 
 /**
  * dumps a portable pixelmap containing the front buffer (RRGGBB, alpha is ignored)
+ * useful for debugging (maybe. idk)
  */
 void renderer_write_ppm(Renderer* r) {
     printf("P6\n%d %d\n255\n", r->width, r->height);
@@ -110,4 +120,45 @@ void renderer_write_ppm(Renderer* r) {
         putchar((px >> 8)  & 0xFF); // blu
     }
 }
- 
+
+// all of this is for drawing triangles.
+// i dont even know
+
+/**
+ * return the minimum of three numbers
+ */
+static u16 min3(u16 a, u16 b, u16 c) { return a < b ? (a < c ? a : c) : (b < c ? b : c); }
+
+/**
+ * return the maximum of 3 numbers
+ */
+static u16 max3(u16 a, u16 b, u16 c) { return a > b ? (a > c ? a : c) : (b > c ? b : c); }
+
+/**
+ * returns the 2D cross product of vector (a->b) and vector (a->p).
+ * this is literal magic to me and i very much so had to look up a lot
+ */
+static int edge(Vec2 a, Vec2 b, u16 px, u16 py) {
+    return (int)(b.x - a.x) * (int)(py - a.y) - (int)(b.y - a.y) * (int)(px - a.x);
+}
+
+/**
+ * draw a triangle given three (x, y) points and a color.
+ */
+void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, u32 col) {
+    u16 minx = min3(a.x, b.x, c.x), maxx = max3(a.x, b.x, c.x);
+    u16 miny = min3(a.y, b.y, c.y), maxy = max3(a.y, b.y, c.y);
+
+    for (u16 py = miny; py <= maxy; py++) {
+        for (u16 px = minx; px <= maxx; px++) {
+            int w0 = edge(a, b, px, py);
+            int w1 = edge(b, c, px, py);
+            int w2 = edge(c, a, px, py);
+
+            if ((w0 >= 0 && w1 >= 0 && w2 >= 0) ||
+                (w0 <= 0 && w1 <= 0 && w2 <= 0)) {
+                draw_pixel(r, px, py, col);
+            }
+        }
+    }
+}

@@ -5,7 +5,13 @@
  * back buffer (does not display to the user) -> draw into something without displaying the drawing process
  * front buffer (does display to the user)    -> display a fully drawn buffer to the user 
  */
+#ifndef RENDERER_H
+#define RENDERER_H
+
 #include <inttypes.h>
+#include <assert.h>
+#include <stdio.h>
+#include <math.h>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -79,4 +85,77 @@ void draw_rectangle(Renderer* r, u16 x, u16 y, u16 w, u16 h, u32 col);
 void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, u32 col);
 
 // helpers we might need
-// void renderer_write_ppm(Renderer* r);  // dump renderer content to stdout using a portable pixelmap
+void renderer_write_ppm(Renderer* r);  // dump renderer content to stdout using a portable pixelmap
+
+
+// simple check to make sure buffers work fine
+static inline int test_renderer() {
+    Renderer* r = make_renderer(800, 600);
+
+    // ensure allocation succeeded
+    assert(r != NULL);
+    assert(r->back  != NULL && r->back->data  != NULL);
+    assert(r->front != NULL && r->front->data != NULL);
+
+    // check dimensions match what was requested
+    assert(r->width  == 800);
+    assert(r->height == 600);
+    assert(r->back->width   == 800 && r->back->height  == 600);
+    assert(r->front->width  == 800 && r->front->height == 600);
+
+    // check that front and back are separate allocations
+    assert(r->back != r->front);
+    assert(r->back->data != r->front->data);
+
+    // check writing to back doesn't affect front
+    r->back->data[0] = 0xDEADBEEF;
+    assert(r->front->data[0] != 0xDEADBEEF);
+
+    // check renderer_clear actually fills the back buffer
+    u32 n = (u32)r->back->width * (u32)r->back->height;
+
+    // poison back buffer (to check that clear actually wrote over it)
+    for (u32 i = 0; i < n; i++) r->back->data[i] = 0xDEADBEEF;
+    clear_renderer(r, COLOR_RED);
+
+    // check that it was overwritten
+    for (u32 i = 0; i < n; i++) {
+        assert(r->back->data[i] == COLOR_RED);
+    }
+
+    // check front buffer is untouched (clear should only target the back buffer)
+    assert(r->front->data[0] != COLOR_RED);
+
+    // check flip_renderer swaps pointers
+    Buffer* old_front = r->front;
+    Buffer* old_back  = r->back;
+
+    flip_renderer(r);
+
+    assert(r->front == old_back);
+    assert(r->back  == old_front);
+
+    // check that front now shows what the back was filled with
+    assert(r->front->data[0] == COLOR_RED);
+
+    // check that draw_pixel writes correctly (back buffer, right index)
+    clear_renderer(r, COLOR_BLACK);
+    draw_pixel(r, 10, 5, COLOR_GREEN);
+    u32 expected_index = (u32)5 * r->width + 10;
+    assert(r->back->data[expected_index] == COLOR_GREEN);
+
+    // neighboring pixels should be untouched
+    assert(r->back->data[expected_index - 1] == COLOR_BLACK);
+    assert(r->back->data[expected_index + 1] == COLOR_BLACK);
+
+    // check draw_pixel bounds using out of bounds values
+    draw_pixel(r, r->width, 0, COLOR_GREEN);
+    draw_pixel(r, 0, r->height, COLOR_GREEN);
+
+    // all good!
+    printf("sanity check passed\n");
+    destroy_renderer(r);
+    return 1;
+}
+
+#endif
