@@ -1,3 +1,4 @@
 # environment shit
 build/
 vcpkg_installed/
+.vscode
