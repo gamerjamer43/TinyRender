@@ -80,6 +80,55 @@ void flip_renderer(Renderer* r) {
     r->back      = temp;
 }
 
+// fill api (private)
+static inline Fill fill_solid(u32 color) {
+    return (Fill){
+        .type = FILL_SOLID,
+        .color_a = color,
+        .color_b = color
+    };
+}
+
+static inline Fill fill_linear(Vec2 start, Vec2 end, u32 a, u32 b) {
+    return (Fill){
+        .type = FILL_GRADIENT,
+        .color_a = a,
+        .color_b = b,
+        .start = start,
+        .end = end
+    };
+}
+
+static u32 sample_fill(Fill fill, u16 x, u16 y) {
+    // reject solid fills
+    if (fill.type == FILL_SOLID) {
+        return fill.color_a;
+    }
+
+    // direction vector
+    float dx = (float)fill.end.x - fill.start.x;
+    float dy = (float)fill.end.y - fill.start.y;
+    float len2 = dx * dx + dy * dy;
+
+    // start and end share the same point, reject
+    if (len2 == 0.0f) {
+        return fill.color_a;
+    }
+
+    // vector from gradient start to current pixel
+    float px = (float)x - fill.start.x;
+    float py = (float)y - fill.start.y;
+
+    // dot product projection
+    float t = (px * dx + py * dy) / len2;
+
+    // truncate at 0 and 1
+    if (t < 0.0f) t = 0.0f;
+    if (t > 1.0f) t = 1.0f;
+
+    return lerp_color(fill.color_a, fill.color_b, t);
+}
+
 // draw api (public)
 /**
  * draw a single pixel to the screen

@@ -63,6 +63,21 @@ typedef struct {
     u16 x, y, z;
 } Vec3; // unused for rn (will when z buffering comes in)
 
+// fills (can either be solid color or gradient, other textures coming later)
+typedef enum {
+    FILL_SOLID,
+    FILL_GRADIENT
+} FillType;
+
+typedef struct {
+    Vec2 start; // 4 bytes
+    Vec2 end;   // 4 bytes
+    u32 color_a; // 4 bytes
+    u32 color_b; // 4 bytes
+    FillType type; // 1 byte (3 padding)
+} Fill;
+
+static_assert(sizeof(Fill) == 20, "fill size doesnt match expected layout");
 
 // buffer itself
 typedef struct {
