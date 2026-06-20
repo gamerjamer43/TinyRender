@@ -145,7 +145,7 @@ void rainbow_triangle_test(void) {
 
 int main(void) {
     triangle_test();
-    // circle_test();
-    // rainbow_triangle_test();
+    circle_test();
+    rainbow_triangle_test();
     return 1;
 }
