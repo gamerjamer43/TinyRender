@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL2_ttf CONFIG REQUIRED)
 
 add_executable(renderer main.c src/renderer.c src/display.c)
 target_include_directories(renderer PRIVATE src)
@@ -12,4 +13,5 @@ target_include_directories(renderer PRIVATE src)
 target_link_libraries(renderer PRIVATE
     SDL2::SDL2
     SDL2::SDL2main
+    SDL2_ttf::SDL2_ttf
 )

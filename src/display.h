@@ -2,6 +2,7 @@
 #define DISPLAY_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "renderer.h"
 
 /**
@@ -11,11 +12,12 @@ typedef struct {
     SDL_Window*   window;
     SDL_Renderer* sdl_renderer;
     SDL_Texture*  texture;
+    TTF_Font*     font;
 } Display;
 
 // display api
 Display display_create(Renderer* r, const char* title);
-void display_present(Display* d, Renderer* r);
+void display_present(Display* d, Renderer* r, int fps);
 void display_destroy(Display* d);
 
 // sdl helper
