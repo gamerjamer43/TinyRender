@@ -3,16 +3,8 @@
 #include <stdio.h>
 
 static TTF_Font* display_open_font(void) {
-    const char* paths[] = {
-        "DejaVuSans.ttf",
-        "C:\\Windows\\Fonts\\segoeui.ttf",
-        "C:\\Windows\\Fonts\\arial.ttf",
-    };
-
-    for (int i = 0; i < (int)(sizeof(paths) / sizeof(paths[0])); i++) {
-        TTF_Font* font = TTF_OpenFont(paths[i], 20);
-        if (font) return font;
-    }
+    TTF_Font* font = TTF_OpenFont("C:\\Windows\\Fonts\\dosapp.fon", 64);
+    if (font) return font;
 
     fprintf(stderr, "warning: could not load FPS font: %s\n", TTF_GetError());
     return NULL;
@@ -35,9 +27,10 @@ Display display_create(Renderer* r, const char* title) {
         r->width, r->height, 0);
 
     // create a renderer with whatever driver you can
-    // hardware acceleration and vsync enabled
+    // hardware acceleration
+    // enable vsync by adding | SDL_RENDERER_PRESENTVSYNC
     d.sdl_renderer = SDL_CreateRenderer(d.window, -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        SDL_RENDERER_ACCELERATED);
 
     // texture defaults to RGBA8888 with a stream based access
     d.texture = SDL_CreateTexture(d.sdl_renderer,
@@ -50,18 +43,18 @@ Display display_create(Renderer* r, const char* title) {
 }
 
 // draw an fps counter on the screen
+SDL_Color white = {255, 255, 255, 255};
 static void display_draw_fps(Display* d, Renderer* r, int fps) {
     // convert int to string
     char buf[16];
     snprintf(buf, sizeof(buf), "%d fps", fps);
 
     // create a white text texture
-    SDL_Color white = {255, 255, 255, 255};
     SDL_Surface* surf = TTF_RenderText_Blended(d->font, buf, white);
     SDL_Texture* text_tex = SDL_CreateTextureFromSurface(d->sdl_renderer, surf);
 
-    // copy texture to renderer
-    SDL_Rect dst = { r->width - surf->w - 10, 10, surf->w, surf->h };
+    // copy texture to renderer (size up text 2x)
+    SDL_Rect dst = { r->width - surf->w - 30, 10, surf->w * 2, surf->h * 2};
     SDL_RenderCopy(d->sdl_renderer, text_tex, NULL, &dst);
 
     // destroy when done
@@ -82,7 +75,7 @@ void display_present(Display* d, Renderer* r, int fps) {
 // free helper for display
 void display_destroy(Display* d) {
     if (d->font) TTF_CloseFont(d->font);
-    
+
     SDL_DestroyTexture(d->texture);
     SDL_DestroyRenderer(d->sdl_renderer);
     SDL_DestroyWindow(d->window);

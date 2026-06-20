@@ -145,6 +145,27 @@ void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, u32 col) {
 }
 
 /**
+ * draw a filled circle given a center, radius, and color
+ */
+void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, u32 color) {
+    int r2 = (int)radius * (int)radius;
+
+    for (int py = cy - radius; py <= cy + radius; py++) {
+        for (int px = cx - radius; px <= cx + radius; px++) {
+            // underflow guard
+            if (px < 0 || py < 0) continue;
+
+            int dx = px - cx;
+            int dy = py - cy;
+
+            if (dx * dx + dy * dy <= r2) {
+                draw_pixel(r, (u16)px, (u16)py, color);
+            }
+        }
+    }
+}
+
+/**
  * dumps a portable pixelmap containing the front buffer (RRGGBB, alpha is ignored)
  * useful for debugging (maybe. idk)
  */
