@@ -96,6 +96,30 @@ static void draw_text_frame(TestContext* ctx) {
     }
 }
 
+/**
+ * draws steamhappy to the center of the screen with rainbow text below it
+ */
+const char* STEAMHAPPY = "steamhappy!!!";
+const Sprite* IMAGE = NULL;
+
+static void draw_image_frame(TestContext* ctx) {
+    u8 scale = 3;
+    u32 len = strlen(STEAMHAPPY);
+
+    // center offset
+    u16 x = ctx->center.x - (len * 8 * scale) / 2;
+    u16 y = ctx->center.y - (8 * scale) / 2 - 150;
+    Vec2 pos = {x, y};
+
+    for (u32 i = 0; i < len; i++) {
+        // shift over time
+        f32 hue = ((f32)i / len) + ctx->time * 0.04f;
+        draw_char(ctx->r, x + i * 8 * scale, y, STEAMHAPPY[i], rainbow_color(hue), scale);
+    }
+
+    draw_sprite(ctx->r, IMAGE, pos);
+}
+
 void triangle_test(void) {
     run_test(TITLE, RESOLUTION, draw_triangle_frame);
 }
@@ -112,10 +136,16 @@ void rainbow_text_test(void) {
     run_test(TITLE, RESOLUTION, draw_text_frame);
 }
 
+void image_test(void) {
+    IMAGE = sprite_load("assets/steamhappy.png");
+    run_test(TITLE, RESOLUTION, draw_image_frame);
+}
+
 int main(void) {
     // triangle_test();
     // circle_test();
     // rainbow_triangle_test();
-    rainbow_text_test();
+    // rainbow_text_test();
+    image_test();
     return 1;
 }

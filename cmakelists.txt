@@ -4,8 +4,9 @@ project(renderer C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# not strictly necessary but a nice performance boost. no UB afaik
-add_compile_options(-O3 -march=native)
+# always build with O2 on holy shit. i got 2000fps
+# only works with release. cmake --build build --config Release
+add_compile_options(/O2)
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_ttf CONFIG REQUIRED)

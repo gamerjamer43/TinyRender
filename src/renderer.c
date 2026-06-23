@@ -284,6 +284,38 @@ void draw_text(Renderer* r, u16 x, u16 y, const char* text, u32 color, u8 scale)
     }
 }
 
+void draw_sprite(Renderer* r, Sprite* s, u16 x, u16 y) {
+    // work through each row first
+    for (u16 row = 0; row < s->height; row++) {
+        u16 dy = y + row;
+        if (dy >= r->height) break;
+
+        // then column
+        for (u16 col = 0; col < s->width; col++) {
+            u16 dx = x + col;
+            if (dx >= r->width) break;
+
+            // grab source pixel, extract alpha (skip transparent)
+            u32 src = s->data[(u32)row * s->width + col];
+            u8  sa  = src & 0xFF;
+            if (sa == 0) continue;
+
+            // if fully opaque no lerp needed
+            if (sa == 255)
+                r->back->data[(u32)dy * r->width + dx] = src;
+            
+            else {
+                // get color already on screen
+                u32 dst = r->back->data[(u32)dy * r->width + dx];
+
+                // lerp to that color (using 0-1 normalized alpha)
+                float t = sa / 255.0f;
+                r->back->data[(u32)dy * r->width + dx] = lerp_color(dst, src, t);
+            }
+        }
+    }
+}
+
 /**
  * dumps a portable pixelmap containing the front buffer (RRGGBB, alpha is ignored)
  * useful for debugging (maybe. idk)
