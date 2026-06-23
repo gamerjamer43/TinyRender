@@ -8,6 +8,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "font.h"
 #include <inttypes.h>
 #include <assert.h>
 #include <stdio.h>
@@ -129,6 +130,8 @@ void draw_pixel(Renderer* r, u16 x, u16 y, u32 col);
 void draw_rectangle(Renderer* r, u16 x, u16 y, u16 w, u16 h, Fill fill);
 void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, Fill fill);
 void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, Fill fill);
+void draw_char(Renderer* r, u16 x, u16 y, char c, u32 color, u8 scale);
+void draw_text(Renderer* r, u16 x, u16 y, const char* text, u32 color, u8 scale);
 
 // helpers we might need
 void renderer_write_ppm(Renderer* r);  // dump renderer content to stdout using a portable pixelmap

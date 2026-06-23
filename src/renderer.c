@@ -130,6 +130,14 @@ static u32 sample_fill(Fill fill, u16 x, u16 y) {
 }
 
 // draw api (public)
+
+/**
+ * draw a single pixel to the screen without checking bounds
+ */
+static inline void draw_pixel_unsafe(Renderer* r, u16 x, u16 y, u32 color) {
+    r->back->data[(u32)y * r->width + x] = color;
+}
+
 /**
  * draw a single pixel to the screen
  */
@@ -211,6 +219,27 @@ void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, Fill fill) {
                 draw_pixel(r, (u16)px, (u16)py, sample_fill(fill, (u16)px, (u16)py));
             }
         }
+    }
+}
+
+void draw_char(Renderer* r, u16 x, u16 y, char c, u32 color, u8 scale) {
+    if (c < 0x20 || c > 0x7E) c = '?';
+
+    const u8* glyph = font8x8[(u8)c - 0x20];
+    for (int row = 0; row < 8; row++) {
+        for (int col = 0; col < 8; col++) {
+            if (glyph[row] & (1 << col))
+                draw_rectangle(r, x + col*scale, y + row*scale, scale, scale, fill_solid(color));
+        }
+    }
+}
+
+void draw_text(Renderer* r, u16 x, u16 y, const char* text, u32 color, u8 scale) {
+    u16 cursor = x;
+    while (*text) {
+        draw_char(r, cursor, y, *text, color, scale);
+        cursor += 8 * scale;
+        text++;
     }
 }
 

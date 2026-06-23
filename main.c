@@ -3,11 +3,14 @@
 #include "display.h"
 #include "renderer.h"
 
+// change this to edit the title
+const char* TITLE = "simple software renderer";
+
 // shared state every test gets access to each frame
 typedef struct {
     Renderer* r;
     Vec2 center;
-    float time; // accumulates every frame, drives all animation
+    float time;
 } TestContext;
 
 typedef void (*DrawFn)(TestContext* ctx);
@@ -45,13 +48,14 @@ static void run_test(const char* title, DrawFn draw_fn) {
             char title_buf[16];
             fps = frame_count;
             snprintf(title_buf, sizeof(title_buf), "%d fps", fps);
+
             frame_count = 0;
             fps_timer = now;
         }
 
         display_present(&d, r, fps);
 
-        // advance 0.02 "radians" of time per tick
+        // rotate by 0.02f radians
         ctx.time += 0.02f;
     }
 
@@ -131,21 +135,44 @@ static void draw_circle_frame(TestContext* ctx) {
     draw_circle(ctx->r, (u16)ctx->center.x, (u16)ctx->center.y, radius, fill);
 }
 
+/**
+ * draws hello world to the center of the screen, and cycles its color
+ */
+static void draw_text_frame(TestContext* ctx) {
+    u8 scale = 3;
+    int len = strlen(TITLE);
+
+    // center offset
+    u16 x = ctx->center.x - (len * 8 * scale) / 2;
+    u16 y = ctx->center.y - (8 * scale) / 2;
+
+    for (int i = 0; i < len; i++) {
+        // shift over time
+        float hue = ((float)i / len) + ctx->time * 0.04f;
+        draw_char(ctx->r, x + i * 8 * scale, y, TITLE[i], rainbow_color(hue), scale);
+    }
+}
+
 void triangle_test(void) {
-    run_test("simple software renderer", draw_triangle_frame);
+    run_test(TITLE, draw_triangle_frame);
 }
 
 void circle_test(void) {
-    run_test("simple software renderer", draw_circle_frame);
+    run_test(TITLE, draw_circle_frame);
 }
 
 void rainbow_triangle_test(void) {
-    run_test("simple software renderer", draw_rainbow_triangle_frame);
+    run_test(TITLE, draw_rainbow_triangle_frame);
+}
+
+void rainbow_text_test(void) {
+    run_test(TITLE, draw_text_frame);
 }
 
 int main(void) {
-    triangle_test();
-    circle_test();
-    rainbow_triangle_test();
+    // triangle_test();
+    // circle_test();
+    // rainbow_triangle_test();
+    rainbow_text_test();
     return 1;
 }
