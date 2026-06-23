@@ -79,12 +79,39 @@ void flip_renderer(Renderer* r) {
 }
 
 /**
- * add a sprite to the plane given an image ref, and x, y coords
+ * load in a sprite given its path. it can then be drawn to the screen by reference passing
  */
+Sprite* sprite_load(const char* path) {
+    SDL_Surface* raw = IMG_Load(path);
+    if (!raw) {
+        fprintf(stderr, "sprite_load: %s\n", IMG_GetError());
+        return NULL;
+    }
 
-// Sprite *sprite_load(const char *path) {
-//     SDL_Surface raw = 
-// }
+    // RGBA32 aligns with what i have setup
+    SDL_Surface* surf = SDL_ConvertSurfaceFormat(raw, SDL_PIXELFORMAT_RGBA32, 0);
+    SDL_FreeSurface(raw);
+    if (!surf) return NULL;
+
+    // malloc and setup
+    Sprite* s  = malloc(sizeof(Sprite));
+    s->width   = (u16)surf->w;
+    s->height  = (u16)surf->h;
+    s->data    = malloc((u32)s->width * s->height * sizeof(u32));
+
+    // copy pixels
+    u8* src = (u8*)surf->pixels;
+    for (u32 i = 0; i < (u32)s->width * s->height; i++) {
+        u8 r = src[i * 4 + 0];
+        u8 g = src[i * 4 + 1];
+        u8 b = src[i * 4 + 2];
+        u8 a = src[i * 4 + 3];
+        s->data[i] = pack_color(r, g, b, a);
+    }
+
+    SDL_FreeSurface(surf);
+    return s;
+}
 
 /**
  * remove a created sprite from the plane
