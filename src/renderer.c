@@ -121,9 +121,9 @@ static u32 sample_fill(Fill fill, u16 x, u16 y) {
     }
 
     // direction vector
-    float dx = (float)fill.end.x - fill.start.x;
-    float dy = (float)fill.end.y - fill.start.y;
-    float len2 = dx * dx + dy * dy;
+    f32 dx = (f32)fill.end.x - fill.start.x;
+    f32 dy = (f32)fill.end.y - fill.start.y;
+    f32 len2 = dx * dx + dy * dy;
 
     // start and end share the same point, reject
     if (len2 == 0.0f) {
@@ -131,11 +131,11 @@ static u32 sample_fill(Fill fill, u16 x, u16 y) {
     }
 
     // vector from gradient start to current pixel
-    float px = (float)x - fill.start.x;
-    float py = (float)y - fill.start.y;
+    f32 px = (f32)x - fill.start.x;
+    f32 py = (f32)y - fill.start.y;
 
     // dot product projection
-    float t = (px * dx + py * dy) / len2;
+    f32 t = (px * dx + py * dy) / len2;
 
     // truncate at 0 and 1
     if (t < 0.0f) t = 0.0f;
@@ -190,8 +190,8 @@ static u16 max3(u16 a, u16 b, u16 c) { return a > b ? (a > c ? a : c) : (b > c ?
  * returns the 2D cross product of vector (a->b) and vector (a->p).
  * this is literal magic to me and i very much so had to look up a lot
  */
-static int edge(Vec2 a, Vec2 b, u16 px, u16 py) {
-    return (int)(b.x - a.x) * (int)(py - a.y) - (int)(b.y - a.y) * (int)(px - a.x);
+static u32 edge(Vec2 a, Vec2 b, u16 px, u16 py) {
+    return (u32)(b.x - a.x) * (u32)(py - a.y) - (u32)(b.y - a.y) * (u32)(px - a.x);
 }
 
 /**
@@ -203,9 +203,9 @@ void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, Fill fill) {
 
     for (u16 py = miny; py <= maxy; py++) {
         for (u16 px = minx; px <= maxx; px++) {
-            int w0 = edge(a, b, px, py);
-            int w1 = edge(b, c, px, py);
-            int w2 = edge(c, a, px, py);
+            u32 w0 = edge(a, b, px, py);
+            u32 w1 = edge(b, c, px, py);
+            u32 w2 = edge(c, a, px, py);
 
             if ((w0 >= 0 && w1 >= 0 && w2 >= 0) ||
                 (w0 <= 0 && w1 <= 0 && w2 <= 0)) {
@@ -219,15 +219,15 @@ void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, Fill fill) {
  * draw a filled circle given a center, radius, and fill
  */
 void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, Fill fill) {
-    int r2 = (int)radius * (int)radius;
+    u32 r2 = (u32)radius * (u32)radius;
 
-    for (int py = cy - radius; py <= cy + radius; py++) {
-        for (int px = cx - radius; px <= cx + radius; px++) {
+    for (u32 py = cy - radius; py <= cy + radius; py++) {
+        for (u32 px = cx - radius; px <= cx + radius; px++) {
             // underflow guard
             if (px < 0 || py < 0) continue;
 
-            int dx = px - cx;
-            int dy = py - cy;
+            u32 dx = px - cx;
+            u32 dy = py - cy;
 
             if (dx * dx + dy * dy <= r2) {
                 draw_pixel(r, (u16)px, (u16)py, sample_fill(fill, (u16)px, (u16)py));
@@ -240,8 +240,8 @@ void draw_char(Renderer* r, u16 x, u16 y, char c, u32 color, u8 scale) {
     if (c < 0x20 || c > 0x7E) c = '?';
 
     const u8* glyph = font8x8[(u8)c - 0x20];
-    for (int row = 0; row < 8; row++) {
-        for (int col = 0; col < 8; col++) {
+    for (u32 row = 0; row < 8; row++) {
+        for (u32 col = 0; col < 8; col++) {
             if (glyph[row] & (1 << col))
                 draw_rectangle(r, x + col*scale, y + row*scale, scale, scale, fill_solid(color));
         }

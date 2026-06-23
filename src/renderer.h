@@ -3,6 +3,7 @@
 
 #include "font.h"
 
+#include <SDL2/SDL_image.h>
 #include <inttypes.h>
 #include <assert.h>
 #include <stdio.h>
@@ -10,11 +11,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-// #include <SDL2/SDL_image.h>
-
-typedef uint8_t u8;
+// numeric type aliases
+typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
+typedef uint64_t u64;
+typedef float    f32;
 
 // color helper (packing 4 u8s into u32 RRGGBBAA)
 static inline u32 pack_color(u8 r, u8 g, u8 b, u8 a) {
@@ -29,12 +31,12 @@ static inline u32 pack_color(u8 r, u8 g, u8 b, u8 a) {
 #define COLOR_BLUE  pack_color(0,   0,   255, 255)
 
 // color interpolation (from point a to b by a factor of t)
-static u8 lerp_u8(u8 a, u8 b, float t) {
+static u8 lerp_u8(u8 a, u8 b, f32 t) {
     return (u8)(a + (b - a) * t);
 }
 
 // take each channel and lerp as a u8, then repack
-static u32 lerp_color(u32 a, u32 b, float t) {
+static u32 lerp_color(u32 a, u32 b, f32 t) {
     u8 ar = (a >> 24) & 0xFF;
     u8 ag = (a >> 16) & 0xFF;
     u8 ab = (a >> 8) & 0xFF;
@@ -138,7 +140,7 @@ void draw_text(Renderer* r, u16 x, u16 y, const char* text, u32 color, u8 scale)
 void draw_sprite(Renderer* r, Sprite* s, Vec2 pos);
 
 // simple check to make sure buffers work fine
-static inline int test_renderer(void) {
+static inline u32 test_renderer(void) {
     Renderer* r = make_renderer(800, 600);
 
     // ensure allocation succeeded

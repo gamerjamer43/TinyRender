@@ -43,11 +43,11 @@ Display display_create(Renderer* r, const char* title) {
 
 // draw an fps counter on the screen
 SDL_Color white = {255, 255, 255, 255};
-static int last_fps = -1;
+static u32 last_fps = -1;
 static SDL_Texture* fps_tex = NULL;
-static int fps_w, fps_h;
+static u32 fps_w, fps_h;
 
-static void display_draw_fps(Display* d, Renderer* r, int fps) {
+static void display_draw_fps(Display* d, Renderer* r, u32 fps) {
     if (!d->font) return;
 
     if (fps != d->fps_last) {
@@ -70,7 +70,7 @@ static void display_draw_fps(Display* d, Renderer* r, int fps) {
 }
 
 // copy data from renderer to sdl
-void display_present(Display* d, Renderer* r, int fps) {
+void display_present(Display* d, Renderer* r, u32 fps) {
     SDL_UpdateTexture(d->texture, NULL, r->front->data, r->width * sizeof(u32));
     SDL_RenderCopy(d->sdl_renderer, d->texture, NULL, NULL);
 

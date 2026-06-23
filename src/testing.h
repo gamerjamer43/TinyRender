@@ -8,7 +8,7 @@
 typedef struct {
     Renderer* r;
     Vec2 center;
-    float time;
+    f32 time;
 } TestContext;
 
 typedef void (*DrawFn)(TestContext* ctx);
@@ -31,20 +31,20 @@ static void run_test(const char* title, Vec2 resolution, DrawFn draw_fn) {
         .time = 0.0f
     };
 
-    Uint64 perf_freq = SDL_GetPerformanceFrequency();
-    Uint32 fps_timer = SDL_GetTicks();
-    int frame_count = 0;
-    int fps = 0;
+    u64 perf_freq = SDL_GetPerformanceFrequency();
+    u32 fps_timer = SDL_GetTicks();
+    u32 frame_count = 0;
+    u32 fps = 0;
 
     while (!poll_should_quit()) {
-        Uint64 frame_start = SDL_GetPerformanceCounter();
+        u64 frame_start = SDL_GetPerformanceCounter();
 
         clear_renderer(r, COLOR_BLACK);
         draw_fn(&ctx);
         flip_renderer(r);
 
         frame_count++;
-        Uint32 now = SDL_GetTicks();
+        u32 now = SDL_GetTicks();
         if (now - fps_timer >= 1000) {
             fps = frame_count;
             frame_count = 0;
@@ -54,10 +54,10 @@ static void run_test(const char* title, Vec2 resolution, DrawFn draw_fn) {
         display_present(&d, r, fps);
 
         if (r->fps > 0) {
-            Uint64 target = perf_freq / r->fps;
-            Uint64 elapsed = SDL_GetPerformanceCounter() - frame_start;
+            u64 target = perf_freq / r->fps;
+            u64 elapsed = SDL_GetPerformanceCounter() - frame_start;
             if (elapsed < target) {
-                Uint32 sleep_ms = (Uint32)((target - elapsed) * 1000 / perf_freq);
+                u32 sleep_ms = (u32)((target - elapsed) * 1000 / perf_freq);
                 if (sleep_ms > 2)
                     SDL_Delay(sleep_ms - 2);
                 while (SDL_GetPerformanceCounter() - frame_start < target) {}
