@@ -1,7 +1,4 @@
 #include "renderer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 // buffer api (private)
 /**
@@ -81,6 +78,22 @@ void flip_renderer(Renderer* r) {
     r->back      = temp;
 }
 
+/**
+ * add a sprite to the plane given an image ref, and x, y coords
+ */
+
+// Sprite *sprite_load(const char *path) {
+//     SDL_Surface raw = 
+// }
+
+/**
+ * remove a created sprite from the plane
+ */
+void sprite_destroy(Sprite *s) {
+    if (!s) return;
+    free(s->data);
+    free(s);
+}
 
 // fill api (private)
 Fill fill_solid(u32 color) {
@@ -132,7 +145,6 @@ static u32 sample_fill(Fill fill, u16 x, u16 y) {
 }
 
 // draw api (public)
-
 /**
  * draw a single pixel to the screen without checking bounds
  */

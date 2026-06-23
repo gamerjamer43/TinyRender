@@ -1,5 +1,3 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include "display.h"
 #include "renderer.h"
 #include "testing.h"

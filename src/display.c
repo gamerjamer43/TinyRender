@@ -1,6 +1,5 @@
 #include "display.h"
 #include "renderer.h"
-#include <stdio.h>
 
 static TTF_Font* display_open_font(void) {
     TTF_Font* font = TTF_OpenFont("C:\\Windows\\Fonts\\dosapp.fon", 64);

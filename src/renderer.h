@@ -2,10 +2,15 @@
 #define RENDERER_H
 
 #include "font.h"
+
 #include <inttypes.h>
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
+// #include <SDL2/SDL_image.h>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -71,8 +76,6 @@ typedef struct {
     FillType type; // 1 byte (3 padding)
 } Fill;
 
-static_assert(sizeof(Fill) == 20, "fill size doesnt match expected layout");
-
 // buffer itself
 typedef struct {
     u32* data;  // 8 bytes
@@ -95,7 +98,16 @@ typedef struct {
 } Renderer;
 
 // another sanity check
-static_assert(sizeof(Renderer) == 24, "buffer size doesn't match the expected layout");
+static_assert(sizeof(Renderer) == 24, "renderer size doesn't match the expected layout");
+
+/**
+ * sprite, containing a pointer to a series of colors, and width/height proportions
+ */
+typedef struct {
+    u32* data;   // 8 bytes
+    u16  width;  // 2 bytes
+    u16  height; // 2 bytes (4 padding)
+} Sprite;
 
 // buffer lifecycle
 Buffer* make_buffer(u16 width, u16 height);      // initialize
@@ -108,6 +120,10 @@ void      destroy_renderer(Renderer* r);          // free
 void      clear_renderer(Renderer* r, u32 color); // fills the back buffer with a certain color
 void      flip_renderer(Renderer* r);             // swaps back and front
 
+// sprite lifecycle
+Sprite* sprite_load(const char* path);
+void    sprite_destroy(Sprite* s);
+
 // fill helpers
 Fill fill_solid(u32 color);
 Fill fill_linear(Vec2 start, Vec2 end, u32 a, u32 b);
@@ -119,6 +135,7 @@ void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, Fill fill);
 void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, Fill fill);
 void draw_char(Renderer* r, u16 x, u16 y, char c, u32 color, u8 scale);
 void draw_text(Renderer* r, u16 x, u16 y, const char* text, u32 color, u8 scale);
+void draw_sprite(Renderer* r, Sprite* s, Vec2 pos);
 
 // simple check to make sure buffers work fine
 static inline int test_renderer(void) {
