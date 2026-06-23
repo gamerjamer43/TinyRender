@@ -11,18 +11,20 @@ Another dumb little project I made which may get mildly expanded on, but mostly 
 - [x] Drawing of rectangles, triangles, circles, text, and single pixels.
 - [x] Solid, gradient, and rainbow textures.
 - [x] Simple display using SDL2
+- [x] PNG based sprite loading
 
 ## What I Can Think of Adding:
 
 - Z-buffering
-- PNG based sprite loading
 - Interactive elements (maybe, click based or keybind based events)
+- Video rendering pipeline (instead of writing data to SDL, plan and segment into mp4 or similar).
+- Python API
 
 ## Known Pitfalls:
 
 - Only 2D is supported right now. You can mock 3D using a bit of geometry but I haven't tested performance.
-- This is only CPU based. Planning to hook OpenGL or just raw dog Vulkan.
-- On higher resolutions, rendering gets exponentially slower. Recommended: 800x600
+- This is only CPU based with GPU acceleration thru SDL. Planning to hook OpenGL or just raw dog Vulkan.
+- On higher resolutions, rendering gets exponentially slower (OH NOOOO 400FPS). Recommended: 800x600
 - No SIMD operations are used in rendering. I haven't benchmarked where I should use them.
 
 ## Why Did I Make This?
