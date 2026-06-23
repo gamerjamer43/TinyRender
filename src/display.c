@@ -49,18 +49,25 @@ static SDL_Texture* fps_tex = NULL;
 static int fps_w, fps_h;
 
 static void display_draw_fps(Display* d, Renderer* r, int fps) {
-    if (fps != last_fps) {
-        if (fps_tex) SDL_DestroyTexture(fps_tex);
+    if (!d->font) return;
+
+    if (fps != d->fps_last) {
+        if (d->fps_tex) SDL_DestroyTexture(d->fps_tex);
+
         char buf[16];
         snprintf(buf, sizeof(buf), "%d fps", fps);
+
         SDL_Surface* surf = TTF_RenderText_Blended(d->font, buf, white);
-        fps_tex = SDL_CreateTextureFromSurface(d->sdl_renderer, surf);
-        fps_w = surf->w; fps_h = surf->h;
+        d->fps_tex   = SDL_CreateTextureFromSurface(d->sdl_renderer, surf);
+        d->fps_tex_w = surf->w;
+        d->fps_tex_h = surf->h;
         SDL_FreeSurface(surf);
-        last_fps = fps;
+
+        d->fps_last = fps;
     }
-    SDL_Rect dst = { r->width - fps_w - 30, 10, fps_w * 2, fps_h * 2 };
-    SDL_RenderCopy(d->sdl_renderer, fps_tex, NULL, &dst);
+
+    SDL_Rect dst = { r->width - d->fps_tex_w - 30, 10, d->fps_tex_w * 2, d->fps_tex_h * 2 };
+    SDL_RenderCopy(d->sdl_renderer, d->fps_tex, NULL, &dst);
 }
 
 // copy data from renderer to sdl

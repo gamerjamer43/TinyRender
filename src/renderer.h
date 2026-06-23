@@ -1,10 +1,3 @@
-/**
- * buffer: reserved space to allow for certain byte values to be drawn
- * 
- * 2 reserved buffers:
- * back buffer (does not display to the user) -> draw into something without displaying the drawing process
- * front buffer (does display to the user)    -> display a fully drawn buffer to the user 
- */
 #ifndef RENDERER_H
 #define RENDERER_H
 
@@ -71,10 +64,10 @@ typedef enum {
 } FillType;
 
 typedef struct {
-    Vec2 start; // 4 bytes
-    Vec2 end;   // 4 bytes
-    u32 color_a; // 4 bytes
-    u32 color_b; // 4 bytes
+    Vec2 start;    // 4 bytes
+    Vec2 end;      // 4 bytes
+    u32 color_a;   // 4 bytes
+    u32 color_b;   // 4 bytes
     FillType type; // 1 byte (3 padding)
 } Fill;
 
@@ -84,9 +77,7 @@ static_assert(sizeof(Fill) == 20, "fill size doesnt match expected layout");
 typedef struct {
     u32* data;  // 8 bytes
     u16 width;  // 2 bytes
-    u16 height; // 2 bytes
-
-    // u8 padding[4]; // 4 bytes padding, explicit
+    u16 height; // 2 bytes (4 padding)
 } Buffer;
 
 // sanity check
@@ -100,11 +91,7 @@ typedef struct {
 
     u16 width;     // 2 bytes
     u16 height;    // 2 bytes
-
-    // potentially add an optional fps cap:
-    // u16 fps; // 2 bytes
-
-    // u8 padding[4]; // 4 bytes padding, explicit
+    u16 fps;       // 2 bytes (2 bytes padding)
 } Renderer;
 
 // another sanity check
@@ -132,10 +119,6 @@ void draw_tri(Renderer* r, Vec2 a, Vec2 b, Vec2 c, Fill fill);
 void draw_circle(Renderer* r, u16 cx, u16 cy, u16 radius, Fill fill);
 void draw_char(Renderer* r, u16 x, u16 y, char c, u32 color, u8 scale);
 void draw_text(Renderer* r, u16 x, u16 y, const char* text, u32 color, u8 scale);
-
-// helpers we might need
-void renderer_write_ppm(Renderer* r);  // dump renderer content to stdout using a portable pixelmap
-
 
 // simple check to make sure buffers work fine
 static inline int test_renderer(void) {

@@ -13,6 +13,11 @@ typedef struct {
     SDL_Renderer* sdl_renderer;
     SDL_Texture*  texture;
     TTF_Font*     font;
+
+    // fps overlay caching
+    SDL_Texture*  fps_tex;
+    int           fps_tex_w, fps_tex_h;
+    int           fps_last;
 } Display;
 
 // display api

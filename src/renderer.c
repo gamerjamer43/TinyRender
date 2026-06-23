@@ -46,6 +46,7 @@ Renderer* make_renderer(u16 width, u16 height) {
 
     r->width  = width;
     r->height = height;
+    r->fps    = 0;
 
     r->back   = make_buffer(width, height);
     r->front  = make_buffer(width, height);
@@ -79,6 +80,7 @@ void flip_renderer(Renderer* r) {
     r->front     = r->back;
     r->back      = temp;
 }
+
 
 // fill api (private)
 Fill fill_solid(u32 color) {
