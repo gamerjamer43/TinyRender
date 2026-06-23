@@ -2,76 +2,11 @@
 #include <SDL2/SDL_ttf.h>
 #include "display.h"
 #include "renderer.h"
+#include "testing.h"
 
-// change this to edit the title
+// setup
 const char* TITLE = "simple software renderer";
-
-// shared state every test gets access to each frame
-typedef struct {
-    Renderer* r;
-    Vec2 center;
-    float time;
-} TestContext;
-
-typedef void (*DrawFn)(TestContext* ctx);
-
-/**
- * runs the boilerplate every test shares: window setup, main loop,
- * fps counter, teardown. each test just hands in a draw_fn that paints
- * one frame given the current time.
- */
-static void run_test(const char* title, DrawFn draw_fn) {
-    test_renderer();
-
-    Renderer* r = make_renderer(1600, 1200);
-    Display d = display_create(r, title);
-    // r->fps = 165; // uncomment to cap fps
-
-    TestContext ctx = {
-        .r = r,
-        .center = { r->width / 2, r->height / 2 },
-        .time = 0.0f
-    };
-
-    Uint64 perf_freq = SDL_GetPerformanceFrequency();
-    Uint32 fps_timer = SDL_GetTicks();
-    int frame_count = 0;
-    int fps = 0;
-
-    while (!poll_should_quit()) {
-        Uint64 frame_start = SDL_GetPerformanceCounter();
-
-        clear_renderer(r, COLOR_BLACK);
-        draw_fn(&ctx);
-        flip_renderer(r);
-
-        frame_count++;
-        Uint32 now = SDL_GetTicks();
-        if (now - fps_timer >= 1000) {
-            fps = frame_count;
-            frame_count = 0;
-            fps_timer = now;
-        }
-
-        display_present(&d, r, fps);
-
-        if (r->fps > 0) {
-            Uint64 target = perf_freq / r->fps;
-            Uint64 elapsed = SDL_GetPerformanceCounter() - frame_start;
-            if (elapsed < target) {
-                Uint32 sleep_ms = (Uint32)((target - elapsed) * 1000 / perf_freq);
-                if (sleep_ms > 2)
-                    SDL_Delay(sleep_ms - 2);
-                while (SDL_GetPerformanceCounter() - frame_start < target) {}
-            }
-        }
-
-        ctx.time += 0.02f;
-    }
-
-    display_destroy(&d);
-    destroy_renderer(r);
-}
+const Vec2 RESOLUTION = { 800, 600 };
 
 /**
  * draws a triangle with 3 vertices orbiting the center, 120 degrees apart
@@ -164,19 +99,19 @@ static void draw_text_frame(TestContext* ctx) {
 }
 
 void triangle_test(void) {
-    run_test(TITLE, draw_triangle_frame);
+    run_test(TITLE, RESOLUTION, draw_triangle_frame);
 }
 
 void circle_test(void) {
-    run_test(TITLE, draw_circle_frame);
+    run_test(TITLE, RESOLUTION, draw_circle_frame);
 }
 
 void rainbow_triangle_test(void) {
-    run_test(TITLE, draw_rainbow_triangle_frame);
+    run_test(TITLE, RESOLUTION, draw_rainbow_triangle_frame);
 }
 
 void rainbow_text_test(void) {
-    run_test(TITLE, draw_text_frame);
+    run_test(TITLE, RESOLUTION, draw_text_frame);
 }
 
 int main(void) {
